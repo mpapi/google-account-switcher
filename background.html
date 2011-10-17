@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <body>
+    <script type="text/javascript">
+      // TODO: need to make this configurable
+      var totalUsers = 2;
+
+      // When the content script sends a request, show the page action.
+      function onRequest(request, sender, sendResponse) {
+        chrome.pageAction.show(sender.tab.id);
+        sendResponse({});
+      };
+
+      // Cycles through users.
+      function nextUser(n) {
+        return (n + 1) % totalUsers;
+      }
+
+      // Given a tab and URL modifier function, will send the tab to the
+      // modified URL. Modifier function takes url, current user #, next user #.
+      function updateUrl(tab, modifier) {
+        var current = parseInt(RegExp.$1);
+        var next = nextUser(current);
+        chrome.tabs.update(tab.id, {url: modifier(tab.url, current, next)});
+      }
+
+      // Listen for the content script to send a message to the background page.
+      chrome.extension.onRequest.addListener(onRequest);
+
+      // Listen for a click on the page action; replace authuser=# or /#/.
+      chrome.pageAction.onClicked.addListener(function(tab) {
+        if (/authuser=(\d)/.test(tab.url)) {
+          updateUrl(tab, function(url, current, next) {
+            return url.replace('authuser=' + current, 'authuser=' + next);
+          });
+        } else if (/\/(\d)\//.test(tab.url)) {
+          updateUrl(tab, function(url, current, next) {
+            return url.replace('/' + current + '/', '/' + next + '/');
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

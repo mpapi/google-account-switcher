@@ -1,0 +1,28 @@
+{
+  "name": "Google Account Switcher",
+  "version": "0.1",
+
+  "description": "Switches between Google accounts with one click.",
+
+  "background_page": "background.html",
+
+  "page_action": {
+    "default_icon": "icon24.png",
+    "default_title": "Switch Google Account"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://*.google.com/*"],
+      "js": ["switcher.js"]
+    }
+  ],
+
+  "permissions": ["tabs"],
+
+  "icons": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+  }
+}  
